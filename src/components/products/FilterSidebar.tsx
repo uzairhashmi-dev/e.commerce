@@ -16,8 +16,9 @@ export function FilterSidebar({ categories }: { categories: Category[] }) {
   const activeCategory = searchParams.get("category") ?? "";
   const activeRating = searchParams.get("rating") ?? "";
   const inStockOnly = searchParams.get("inStock") === "true";
-  const minPrice = searchParams.get("minPrice") ?? "";
-  const maxPrice = searchParams.get("maxPrice") ?? "";
+
+  const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") ?? "");
+  const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") ?? "");
 
   function updateParam(key: string, value: string | null) {
     const params = new URLSearchParams(searchParams.toString());
@@ -28,6 +29,25 @@ export function FilterSidebar({ categories }: { categories: Category[] }) {
     }
     params.delete("page");
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  }
+
+  function applyPriceFilter() {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (minPrice) params.set("minPrice", minPrice);
+    else params.delete("minPrice");
+
+    if (maxPrice) params.set("maxPrice", maxPrice);
+    else params.delete("maxPrice");
+
+    params.delete("page");
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  }
+
+  function handlePriceKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") {
+      applyPriceFilter();
+    }
   }
 
   return (
@@ -79,20 +99,30 @@ export function FilterSidebar({ categories }: { categories: Category[] }) {
             <div className="flex items-center gap-2">
               <input
                 type="number"
+                min={0}
                 placeholder="Min"
-                defaultValue={minPrice}
-                onBlur={(e) => updateParam("minPrice", e.target.value || null)}
+                value={minPrice}
+                onChange={(e) => setMinPrice(e.target.value)}
+                onKeyDown={handlePriceKeyDown}
                 className="w-full rounded-lg border border-muted/20 bg-card px-2 py-1.5 text-sm text-text outline-none focus:border-secondary"
               />
               <span className="text-muted">–</span>
               <input
                 type="number"
+                min={0}
                 placeholder="Max"
-                defaultValue={maxPrice}
-                onBlur={(e) => updateParam("maxPrice", e.target.value || null)}
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(e.target.value)}
+                onKeyDown={handlePriceKeyDown}
                 className="w-full rounded-lg border border-muted/20 bg-card px-2 py-1.5 text-sm text-text outline-none focus:border-secondary"
               />
             </div>
+            <button
+              onClick={applyPriceFilter}
+              className="mt-2 w-full rounded-full bg-secondary py-1.5 text-xs font-semibold text-background transition-opacity hover:opacity-90"
+            >
+              Apply
+            </button>
           </div>
 
           <div>

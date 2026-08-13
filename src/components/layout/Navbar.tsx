@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Menu, X, Search, Heart, ShoppingCart, User, Sun, Moon } from "lucide-react";
 import { Logo } from "./Logo";
 import { useTheme } from "@/hooks/useTheme";
+import { useCartStore } from "@/stores/cartStore";
+import { useWishlistStore } from "@/stores/wishlistStore";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -15,6 +17,14 @@ const navLinks = [
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
+
+  const [mounted, setMounted] = useState(false);
+  const totalItems = useCartStore((state) => state.totalItems());
+  const wishlistCount = useWishlistStore((state) => state.items.length);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 border-b border-muted/10 bg-card">
@@ -50,19 +60,20 @@ export function Navbar() {
             aria-label="Toggle theme"
             className="rounded-full p-2 text-text transition-colors hover:bg-background"
           >
-            {theme === "dark" ? (
-              <Sun className="h-5 w-5" />
-            ) : (
-              <Moon className="h-5 w-5" />
-            )}
+            {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </button>
 
           <Link
             href="/wishlist"
             aria-label="Wishlist"
-            className="hidden rounded-full p-2 text-text transition-colors hover:bg-background sm:block"
+            className="relative hidden rounded-full p-2 text-text transition-colors hover:bg-background sm:block"
           >
             <Heart className="h-5 w-5" />
+            {mounted && wishlistCount > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] font-semibold text-primary">
+                {wishlistCount > 9 ? "9+" : wishlistCount}
+              </span>
+            )}
           </Link>
 
           <Link
@@ -71,9 +82,11 @@ export function Navbar() {
             className="relative rounded-full p-2 text-text transition-colors hover:bg-background"
           >
             <ShoppingCart className="h-5 w-5" />
-            <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] font-semibold text-primary">
-              0
-            </span>
+            {mounted && totalItems > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] font-semibold text-primary">
+                {totalItems > 9 ? "9+" : totalItems}
+              </span>
+            )}
           </Link>
 
           <Link

@@ -1,9 +1,31 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { Heart, Star } from "lucide-react";
 import type { Product } from "@/types";
+import { useCartStore } from "@/stores/cartStore";
+import { useWishlistStore } from "@/stores/wishlistStore";
+import { useToastStore } from "@/stores/toastStore";
 
 export function ProductCard({ product }: { product: Product }) {
+  const addItem = useCartStore((state) => state.addItem);
+  const toggleWishlist = useWishlistStore((state) => state.toggleItem);
+  const isInWishlist = useWishlistStore((state) => state.isInWishlist(product.id));
+  const showToast = useToastStore((state) => state.showToast);
+
+  function handleAddToCart() {
+    addItem(product, 1);
+    showToast(`${product.name} added to cart`);
+  }
+
+  function handleToggleWishlist() {
+    toggleWishlist(product);
+    showToast(
+      isInWishlist ? `${product.name} removed from wishlist` : `${product.name} added to wishlist`
+    );
+  }
+
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-muted/10 bg-card shadow-sm transition-shadow hover:shadow-lg">
       <div className="relative aspect-square overflow-hidden bg-background">
@@ -24,10 +46,11 @@ export function ProductCard({ product }: { product: Product }) {
         )}
 
         <button
-          aria-label="Add to wishlist"
+          onClick={handleToggleWishlist}
+          aria-label="Toggle wishlist"
           className="absolute right-3 top-3 rounded-full bg-card/90 p-2 text-text shadow-sm transition-colors hover:text-error"
         >
-          <Heart className="h-4 w-4" />
+          <Heart className={`h-4 w-4 ${isInWishlist ? "fill-error text-error" : ""}`} />
         </button>
       </div>
 
@@ -47,9 +70,7 @@ export function ProductCard({ product }: { product: Product }) {
         </div>
 
         <div className="mt-1 flex items-center gap-2">
-          <span className="text-base font-bold text-text">
-            ${product.price.toFixed(2)}
-          </span>
+          <span className="text-base font-bold text-text">${product.price.toFixed(2)}</span>
           {product.originalPrice && (
             <span className="text-sm text-muted line-through">
               ${product.originalPrice.toFixed(2)}
@@ -57,8 +78,12 @@ export function ProductCard({ product }: { product: Product }) {
           )}
         </div>
 
-        <button className="mt-2 w-full rounded-full bg-primary py-2 text-sm font-semibold text-background transition-opacity hover:opacity-90">
-          Add to Cart
+        <button
+          onClick={handleAddToCart}
+          disabled={product.stock === 0}
+          className="mt-2 w-full rounded-full bg-primary py-2 text-sm font-semibold text-background transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
         </button>
       </div>
     </div>
