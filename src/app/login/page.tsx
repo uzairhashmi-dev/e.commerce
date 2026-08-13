@@ -31,9 +31,9 @@ export default function LoginPage() {
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-4 py-12 sm:px-6">
       <div className="rounded-2xl border border-muted/10 bg-card p-8">
-        <h1 className="text-2xl font-bold text-text">Welcome back</h1>
+        <h1 className="text-2xl font-bold text-text">Welcome Back</h1>
         <p className="mt-1 text-sm text-muted">
-          This is a frontend demo login — no real authentication is performed.
+          This is a Frontend demo login — no real authentication is Performed.
         </p>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
