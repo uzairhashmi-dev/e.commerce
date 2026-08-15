@@ -2,17 +2,24 @@ import Link from "next/link";
 import { Truck, ShieldCheck, RotateCcw, Headset } from "lucide-react";
 
 const benefits = [
-  { icon: Truck, label: "Free Shipping", desc: "On orders over $50" },
+  { icon: Truck, label: "Free Shipping", desc: "On orders over Rs. 3,000" },
   { icon: ShieldCheck, label: "Secure Payment", desc: "100% protected" },
-  { icon: RotateCcw, label: "Easy Returns", desc: "30-day return policy" },
+  { icon: RotateCcw, label: "Easy Returns", desc: "7-day return policy" },
   { icon: Headset, label: "24/7 Support", desc: "Dedicated support" },
 ];
 
-const footerLinks = {
-  Shop: ["Products", "Categories", "Wishlist", "Cart"],
-  Account: ["Profile", "Orders", "Login"],
-  Company: ["About Us", "Contact", "Careers"],
-};
+const shopLinks = [
+  { label: "All Products", href: "/products" },
+  { label: "Categories", href: "/categories" },
+  { label: "Wishlist", href: "/wishlist" },
+  { label: "Cart", href: "/cart" },
+];
+
+const accountLinks = [
+  { label: "My Profile", href: "/profile" },
+  { label: "My Orders", href: "/orders" },
+  { label: "Login", href: "/login" },
+];
 
 export function Footer() {
   return (
@@ -36,27 +43,50 @@ export function Footer() {
               Shop<span className="text-secondary">Ease</span>
             </p>
             <p className="mt-2 text-sm text-muted">
-              Modern shopping, made simple.
+              Elegance, tailored for you.
             </p>
           </div>
 
-          {Object.entries(footerLinks).map(([section, links]) => (
-            <div key={section}>
-              <p className="text-sm font-semibold text-text">{section}</p>
-              <ul className="mt-3 space-y-2">
-                {links.map((link) => (
-                  <li key={link}>
-                    <Link
-                      href="#"
-                      className="text-sm text-muted transition-colors hover:text-secondary"
-                    >
-                      {link}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          <div>
+            <p className="text-sm font-semibold text-text">Shop</p>
+            <ul className="mt-3 space-y-2">
+              {shopLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-muted transition-colors hover:text-secondary"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <p className="text-sm font-semibold text-text">Account</p>
+            <ul className="mt-3 space-y-2">
+              {accountLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-sm text-muted transition-colors hover:text-secondary"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <p className="text-sm font-semibold text-text">Company</p>
+            <ul className="mt-3 space-y-2">
+              <li className="text-sm text-muted/60">About Us (coming soon)</li>
+              <li className="text-sm text-muted/60">Contact (coming soon)</li>
+              <li className="text-sm text-muted/60">Careers (coming soon)</li>
+            </ul>
+          </div>
         </div>
 
         <div className="border-t border-muted/10 pt-6 text-center text-xs text-muted">

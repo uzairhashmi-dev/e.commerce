@@ -61,29 +61,46 @@ export function ProductTabs({ product, reviews }: { product: Product; reviews: R
           </dl>
         )}
 
-        {activeTab === "reviews" && (
-          <div className="max-w-2xl space-y-5">
-            {reviews.map((review) => (
-              <div key={review.id} className="border-b border-muted/10 pb-4 last:border-0">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold text-text">{review.author}</span>
-                  <span className="text-xs text-muted">{review.date}</span>
-                </div>
-                <div className="mt-1 flex items-center gap-0.5">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`h-3.5 w-3.5 ${
-                        i < review.rating ? "fill-accent text-accent" : "text-muted/30"
-                      }`}
-                    />
-                  ))}
-                </div>
-                <p className="mt-2 text-sm text-muted">{review.comment}</p>
-              </div>
-            ))}
-          </div>
-        )}
+       {activeTab === "specifications" && (
+  <dl className="grid max-w-md grid-cols-2 gap-y-3 text-sm">
+    <dt className="text-muted">SKU</dt>
+    <dd className="text-text">{product.sku}</dd>
+    <dt className="text-muted">Category</dt>
+    <dd className="text-text">{product.category}</dd>
+    {product.fabric && (
+      <>
+        <dt className="text-muted">Fabric</dt>
+        <dd className="text-text">{product.fabric}</dd>
+      </>
+    )}
+    {product.pieceCount && (
+      <>
+        <dt className="text-muted">Pieces</dt>
+        <dd className="text-text">{product.pieceCount}-Piece</dd>
+      </>
+    )}
+    {product.stitched !== undefined && (
+      <>
+        <dt className="text-muted">Stitching</dt>
+        <dd className="text-text">{product.stitched ? "Stitched" : "Unstitched"}</dd>
+      </>
+    )}
+    <dt className="text-muted">Stock</dt>
+    <dd className="text-text">{product.stock} units</dd>
+    {product.colors && (
+      <>
+        <dt className="text-muted">Colors</dt>
+        <dd className="text-text">{product.colors.join(", ")}</dd>
+      </>
+    )}
+    {product.sizes && (
+      <>
+        <dt className="text-muted">Sizes</dt>
+        <dd className="text-text">{product.sizes.join(", ")}</dd>
+      </>
+    )}
+  </dl>
+)}
       </div>
     </div>
   );

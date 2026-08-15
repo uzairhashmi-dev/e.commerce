@@ -1,17 +1,17 @@
-import { Smartphone, Shirt, Footprints, Watch, Sofa, type LucideIcon } from "lucide-react";
+import { Shirt, Layers, Scissors, Sun, Flower2, type LucideIcon } from "lucide-react";
 
 export const categoryIcons: Record<string, LucideIcon> = {
-  electronics: Smartphone,
-  fashion: Shirt,
-  shoes: Footprints,
-  accessories: Watch,
-  home: Sofa,
+  shirts: Shirt,
+  suits: Layers,
+  unstitched: Scissors,
+  lawn: Sun,
+  kurtis: Flower2,
 };
 
 export const categoryColors: Record<string, string> = {
-  electronics: "bg-secondary/10 text-secondary",
-  fashion: "bg-accent/10 text-accent",
-  shoes: "bg-primary/10 text-primary",
-  accessories: "bg-secondary/10 text-secondary",
-  home: "bg-accent/10 text-accent",
+  shirts: "bg-secondary/10 text-secondary",
+  suits: "bg-accent/10 text-accent",
+  unstitched: "bg-primary/10 text-primary",
+  lawn: "bg-secondary/10 text-secondary",
+  kurtis: "bg-accent/10 text-accent",
 };

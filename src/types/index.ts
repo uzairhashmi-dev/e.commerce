@@ -15,6 +15,9 @@ export interface Product {
   sku: string;
   isBestSeller?: boolean;
   isNewArrival?: boolean;
+  fabric?: string;
+  pieceCount?: number;
+  stitched?: boolean;
 }
 
 export interface Category {
@@ -23,6 +26,7 @@ export interface Category {
   slug: string;
   icon: string;
 }
+
 export interface Review {
   id: string;
   author: string;
@@ -74,6 +78,7 @@ export interface Order {
   total: number;
   status: OrderStatus;
 }
+
 export interface User {
   firstName: string;
   lastName: string;

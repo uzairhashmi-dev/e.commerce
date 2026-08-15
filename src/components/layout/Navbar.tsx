@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Menu, X, Search, Heart, ShoppingCart, User, Sun, Moon } from "lucide-react";
 import { Logo } from "./Logo";
@@ -15,7 +16,9 @@ const navLinks = [
 ];
 
 export function Navbar() {
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
   const { theme, toggleTheme } = useTheme();
 
   const [mounted, setMounted] = useState(false);
@@ -25,6 +28,13 @@ export function Navbar() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  function handleSearchSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const query = searchValue.trim();
+    router.push(query ? `/products?search=${encodeURIComponent(query)}` : "/products");
+    setMobileOpen(false);
+  }
 
   return (
     <header className="sticky top-0 z-50 border-b border-muted/10 bg-card">
@@ -43,16 +53,18 @@ export function Navbar() {
           ))}
         </nav>
 
-        <div className="hidden flex-1 max-w-sm md:flex">
+        <form onSubmit={handleSearchSubmit} className="hidden flex-1 max-w-sm md:flex">
           <div className="relative w-full">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
             <input
               type="text"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
               placeholder="Search products..."
               className="w-full rounded-full border border-muted/20 bg-background py-2 pl-9 pr-4 text-sm text-text outline-none transition-colors focus:border-secondary"
             />
           </div>
-        </div>
+        </form>
 
         <div className="flex items-center gap-1 sm:gap-2">
           <button
@@ -109,14 +121,16 @@ export function Navbar() {
 
       {mobileOpen && (
         <div className="border-t border-muted/10 bg-card px-4 pb-4 pt-2 md:hidden">
-          <div className="relative mb-3">
+          <form onSubmit={handleSearchSubmit} className="relative mb-3">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
             <input
               type="text"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
               placeholder="Search products..."
               className="w-full rounded-full border border-muted/20 bg-background py-2 pl-9 pr-4 text-sm text-text outline-none focus:border-secondary"
             />
-          </div>
+          </form>
           <nav className="flex flex-col gap-1">
             {navLinks.map((link) => (
               <Link
