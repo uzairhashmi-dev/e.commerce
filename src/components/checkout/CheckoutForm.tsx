@@ -242,7 +242,7 @@ export function CheckoutForm({
             <Zap className="h-5 w-5 text-secondary" />
             <div>
               <p className="text-sm font-semibold text-text">Express — $14.99</p>
-              <p className="text-xs text-muted">1–2 business days</p>
+              <p className="text-xs text-muted">1–2 Business Days</p>
             </div>
           </button>
         </div>
@@ -251,7 +251,7 @@ export function CheckoutForm({
       <section>
         <h2 className="text-lg font-bold text-text">Payment Method</h2>
         <p className="mt-1 text-xs text-muted">
-          Demo checkout only — no real payment will be processed.
+          Demo checkout only — no real payment will be Processed.
         </p>
 
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">

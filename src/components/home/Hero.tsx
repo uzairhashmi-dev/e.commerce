@@ -27,7 +27,7 @@ export function Hero() {
           </h1>
 
           <p className="mt-5 max-w-sm text-base leading-relaxed text-muted">
-            Shirts, ladies suits, and lawn essentials — hand-picked fabrics
+            Shirts, Ladies suits, and lawn essentials — hand-picked fabrics
             and detailing, made for comfort that doesn't compromise on style.
           </p>
 
@@ -76,7 +76,7 @@ export function Hero() {
               </div>
               <div>
                 <p className="text-sm font-bold text-text">4.8/5</p>
-                <p className="text-xs text-muted">12k+ happy customers</p>
+                <p className="text-xs text-muted">16k+ happy customers</p>
               </div>
             </div>
           </div>

@@ -47,7 +47,7 @@ export function OrderSummaryCheckout({ deliveryMethod }: { deliveryMethod: Deliv
 
       <div className="mt-4 space-y-2 border-t border-muted/10 pt-4 text-sm">
         <div className="flex justify-between text-muted">
-          <span>Subtotal</span>
+          <span>SubTotal</span>
           <span className="text-text">${subtotal.toFixed(2)}</span>
         </div>
         <div className="flex justify-between text-muted">
