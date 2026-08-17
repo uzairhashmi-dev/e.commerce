@@ -213,7 +213,7 @@ export function CheckoutForm({
       </section>
 
       <section>
-        <h2 className="text-lg font-bold text-text">Delivery Method</h2>
+        <h2 className="text-lg font-bold text-text">Delivery method</h2>
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <button
             type="button"
@@ -249,7 +249,7 @@ export function CheckoutForm({
       </section>
 
       <section>
-        <h2 className="text-lg font-bold text-text">Payment Method</h2>
+        <h2 className="text-lg font-bold text-text">Payment method</h2>
         <p className="mt-1 text-xs text-muted">
           Demo checkout only — no real payment will be Processed.
         </p>

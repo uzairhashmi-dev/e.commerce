@@ -16,7 +16,6 @@ export function CartSummary() {
   return (
     <div className="rounded-2xl border border-muted/10 bg-card p-6">
       <h2 className="text-lg font-bold text-text">Order Summary</h2>
-
       <div className="mt-4 space-y-2 text-sm">
         <div className="flex justify-between text-muted">
           <span>Subtotal</span>

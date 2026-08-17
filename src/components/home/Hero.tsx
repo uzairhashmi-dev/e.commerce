@@ -43,7 +43,7 @@ export function Hero() {
               href="/products?category=lawn"
               className="text-sm font-semibold text-text underline decoration-accent decoration-2 underline-offset-4 transition-colors hover:text-secondary"
             >
-              Explore Lawn Edit
+              Explore Lawn edit
             </Link>
           </div>
 
@@ -76,7 +76,7 @@ export function Hero() {
               </div>
               <div>
                 <p className="text-sm font-bold text-text">4.8/5</p>
-                <p className="text-xs text-muted">16k+ happy customers</p>
+                <p className="text-xs text-muted">12k+ happy customers</p>
               </div>
             </div>
           </div>

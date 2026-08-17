@@ -163,7 +163,7 @@ export function FilterSidebar({ categories }: { categories: Category[] }) {
           onClick={() => setMobileOpen(false)}
           className="mt-8 w-full rounded-full bg-primary py-2.5 text-sm font-semibold text-background lg:hidden"
         >
-          Show Results
+          Show results
         </button>
       </aside>
     </>
