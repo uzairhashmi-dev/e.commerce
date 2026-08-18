@@ -16,7 +16,7 @@ export function Hero() {
           <div className="flex items-center gap-3">
             <span className="h-px w-8 bg-accent" />
             <span className="text-xs font-semibold uppercase tracking-[0.2em] text-muted">
-              Festive Edit — New In
+              Festive edit — New In
             </span>
           </div>
 
@@ -25,12 +25,10 @@ export function Hero() {
             <br />
             <span className="italic text-secondary">tailored</span> for you.
           </h1>
-
           <p className="mt-5 max-w-sm text-base leading-relaxed text-muted">
             Shirts, Ladies suits, and lawn essentials — hand-picked fabrics
             and detailing, made for comfort that doesn't compromise on style.
           </p>
-
           <div className="mt-8 flex flex-wrap items-center gap-6">
             <Link
               href="/products"
@@ -76,7 +74,7 @@ export function Hero() {
               </div>
               <div>
                 <p className="text-sm font-bold text-text">4.8/5</p>
-                <p className="text-xs text-muted">12k+ happy customers</p>
+                <p className="text-xs text-muted">14k+ happy customers</p>
               </div>
             </div>
           </div>
