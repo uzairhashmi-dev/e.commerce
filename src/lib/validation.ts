@@ -53,3 +53,52 @@ export function validateCheckoutForm(data: CheckoutFormData): CheckoutErrors {
 
   return errors;
 }
+
+// ===== Auth validation (Login/Signup) =====
+
+export function validateEmail(email: string): string | null {
+  if (!email.trim()) return "Email is required";
+  if (!EMAIL_REGEX.test(email)) return "Enter a valid email address";
+  return null;
+}
+
+export function validatePassword(password: string): string | null {
+  if (!password) return "Password is required";
+  if (password.length < 8) return "Password must be at least 8 characters";
+  if (!/[A-Z]/.test(password)) return "Add at least one uppercase letter";
+  if (!/[a-z]/.test(password)) return "Add at least one lowercase letter";
+  if (!/[0-9]/.test(password)) return "Add at least one number";
+  if (!/[!@#$%^&*(),.?":{}|<>_\-+=]/.test(password)) {
+    return "Add at least one special character (!@#$%...)";
+  }
+  return null;
+}
+
+export interface SignupFormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
+export type SignupErrors = Partial<Record<keyof SignupFormData, string>>;
+
+export function validateSignupForm(data: SignupFormData): SignupErrors {
+  const errors: SignupErrors = {};
+
+  if (!data.firstName.trim()) errors.firstName = "First name is required";
+  if (!data.lastName.trim()) errors.lastName = "Last name is required";
+
+  const emailError = validateEmail(data.email);
+  if (emailError) errors.email = emailError;
+
+  const passwordError = validatePassword(data.password);
+  if (passwordError) errors.password = passwordError;
+
+  if (data.confirmPassword !== data.password) {
+    errors.confirmPassword = "Passwords do not match";
+  }
+
+  return errors;
+}
