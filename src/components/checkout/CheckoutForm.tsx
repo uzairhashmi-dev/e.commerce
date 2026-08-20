@@ -4,9 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useCartStore } from "@/stores/cartStore";
-import { useOrderStore } from "@/stores/orderStore";
 import { validateCheckoutForm, type CheckoutFormData, type CheckoutErrors } from "@/lib/validation";
-import type { DeliveryMethod, Order } from "@/types";
+import type { DeliveryMethod } from "@/types";
 import { Truck, Zap, CreditCard, Banknote, Wallet } from "lucide-react";
 
 const initialFormData: CheckoutFormData = {
@@ -51,11 +50,11 @@ export function CheckoutForm({
   const items = useCartStore((state) => state.items);
   const subtotal = useCartStore((state) => state.subtotal());
   const clearCart = useCartStore((state) => state.clearCart);
-  const addOrder = useOrderStore((state) => state.addOrder);
 
   const [formData, setFormData] = useState<CheckoutFormData>(initialFormData);
   const [errors, setErrors] = useState<CheckoutErrors>({});
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   useEffect(() => {
     if (!session?.user) return;
@@ -79,8 +78,14 @@ export function CheckoutForm({
     }
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setSubmitError("");
+
+    if (!session?.user) {
+      router.push("/login?callbackUrl=/checkout");
+      return;
+    }
 
     const validationErrors = validateCheckoutForm(formData);
     if (Object.keys(validationErrors).length > 0) {
@@ -94,47 +99,64 @@ export function CheckoutForm({
     const tax = subtotal * TAX_RATE;
     const total = subtotal + shippingCost + tax;
 
-    const order: Order = {
-      id: `ORD-${Date.now().toString(36).toUpperCase()}`,
-      date: new Date().toISOString(),
-      items: items.map((item) => ({
-        productId: item.productId,
-        name: item.name,
-        image: item.image,
-        price: item.price,
-        quantity: item.quantity,
-        color: item.color,
-        size: item.size,
-      })),
-      customer: {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        phone: formData.phone,
-      },
-      shippingAddress: {
-        address: formData.address,
-        city: formData.city,
-        state: formData.state,
-        postalCode: formData.postalCode,
-        country: formData.country,
-      },
-      deliveryMethod,
-      paymentMethod: formData.paymentMethod,
-      subtotal,
-      shippingCost,
-      tax,
-      total,
-      status: "Processing",
-    };
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: items.map((item) => ({
+            productId: item.productId,
+            name: item.name,
+            image: item.image,
+            price: item.price,
+            quantity: item.quantity,
+            color: item.color,
+            size: item.size,
+          })),
+          customer: {
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email,
+            phone: formData.phone,
+          },
+          shippingAddress: {
+            address: formData.address,
+            city: formData.city,
+            state: formData.state,
+            postalCode: formData.postalCode,
+            country: formData.country,
+          },
+          deliveryMethod,
+          paymentMethod: formData.paymentMethod,
+          subtotal,
+          shippingCost,
+          tax,
+          total,
+        }),
+      });
 
-    addOrder(order);
-    clearCart();
-    router.push(`/orders/${order.id}`);
+      const data = await res.json();
+
+      if (!res.ok) {
+        setSubmitError(data.error ?? "Something went wrong. Please try again.");
+        setSubmitting(false);
+        return;
+      }
+
+      clearCart();
+      router.push(`/orders/${data.order.id}`);
+    } catch {
+      setSubmitError("Network error. Please try again.");
+      setSubmitting(false);
+    }
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
+      {submitError && (
+        <div className="rounded-lg bg-error/10 px-3 py-2 text-sm text-error">{submitError}</div>
+      )}
+
       <section>
         <h2 className="text-lg font-bold text-text">Customer Information</h2>
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -272,11 +294,11 @@ export function CheckoutForm({
         </p>
 
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-         {[
-        { value: "card", label: "Credit / Debit Card", icon: CreditCard },
-         { value: "cod", label: "Cash on Delivery", icon: Banknote },
-       { value: "wallet", label: "JazzCash / EasyPaisa", icon: Wallet },
-         ].map(({ value, label, icon: Icon }) => (
+          {[
+            { value: "card", label: "Credit / Debit Card", icon: CreditCard },
+            { value: "cod", label: "Cash on Delivery", icon: Banknote },
+            { value: "wallet", label: "JazzCash / EasyPaisa", icon: Wallet },
+          ].map(({ value, label, icon: Icon }) => (
             <button
               key={value}
               type="button"

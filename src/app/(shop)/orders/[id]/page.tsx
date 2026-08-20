@@ -1,42 +1,22 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { notFound } from "next/navigation";
 import { CheckCircle2, Package, Truck, Home } from "lucide-react";
-import { useOrderStore } from "@/stores/orderStore";
+import { getOrderById } from "@/lib/api/orders";
 import { formatPrice } from "@/utils/formatters";
 
 const statusSteps = ["Processing", "Shipped", "Delivered"] as const;
 
-export default function OrderDetailsPage() {
-  const { id } = useParams<{ id: string }>();
-  const router = useRouter();
-  const [mounted, setMounted] = useState(false);
-  const getOrderById = useOrderStore((state) => state.getOrderById);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
-
-  const order = getOrderById(id);
+export default async function OrderDetailsPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const order = await getOrderById(id);
 
   if (!order) {
-    return (
-      <div className="mx-auto flex max-w-7xl flex-col items-center px-4 py-24 text-center">
-        <h1 className="text-2xl font-bold text-text">Order not found</h1>
-        <p className="mt-2 text-sm text-muted">We couldn't find this order.</p>
-        <Link
-          href="/products"
-          className="mt-6 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-background hover:opacity-90"
-        >
-          Browse Products
-        </Link>
-      </div>
-    );
+    notFound();
   }
 
   const currentStepIndex = statusSteps.indexOf(order.status as (typeof statusSteps)[number]);
@@ -153,18 +133,18 @@ export default function OrderDetailsPage() {
       </div>
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-        <button
-          onClick={() => router.push("/products")}
-          className="flex-1 rounded-full bg-primary py-3 text-sm font-semibold text-background hover:opacity-90"
+        <Link
+          href="/products"
+          className="flex-1 rounded-full bg-primary py-3 text-center text-sm font-semibold text-background hover:opacity-90"
         >
           Continue Shopping
-        </button>
-        <button
-          onClick={() => router.push("/orders")}
-          className="flex-1 rounded-full border border-muted/20 py-3 text-sm font-semibold text-text hover:bg-card"
+        </Link>
+        <Link
+          href="/orders"
+          className="flex-1 rounded-full border border-muted/20 py-3 text-center text-sm font-semibold text-text hover:bg-card"
         >
           View All Orders
-        </button>
+        </Link>
       </div>
     </div>
   );

@@ -1,23 +1,15 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { PackageOpen, ChevronRight } from "lucide-react";
-import { useOrderStore } from "@/stores/orderStore";
+import { ChevronRight, PackageOpen } from "lucide-react";
+import { auth } from "@/auth";
+import { getOrdersByUserEmail } from "@/lib/api/orders";
 import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { formatPrice } from "@/utils/formatters";
 
-export default function OrdersPage() {
-  const [mounted, setMounted] = useState(false);
-  const orders = useOrderStore((state) => state.orders);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
+export default async function OrdersPage() {
+  const session = await auth();
+  const orders = session?.user?.email ? await getOrdersByUserEmail(session.user.email) : [];
 
   if (orders.length === 0) {
     return (

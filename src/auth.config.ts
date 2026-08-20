@@ -1,6 +1,6 @@
 import type { NextAuthConfig } from "next-auth";
 
-const PROTECTED_PATHS = ["/profile", "/orders"];
+const PROTECTED_PATHS = ["/profile", "/orders", "/cart", "/wishlist"];
 
 export const authConfig = {
   pages: {

@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { usePathname, useRouter } from "next/navigation";
 import { Star, Heart, Minus, Plus } from "lucide-react";
 import type { Product } from "@/types";
 import { useCartStore } from "@/stores/cartStore";
 import { useWishlistStore } from "@/stores/wishlistStore";
 import { useToastStore } from "@/stores/toastStore";
-import { useRouter } from "next/navigation";
 import { formatPrice } from "@/utils/formatters";
 
 export function ProductInfo({ product }: { product: Product }) {
@@ -14,13 +15,20 @@ export function ProductInfo({ product }: { product: Product }) {
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] ?? undefined);
   const [quantity, setQuantity] = useState(1);
 
+  const { data: session } = useSession();
+  const router = useRouter();
+  const pathname = usePathname();
+
   const addItem = useCartStore((state) => state.addItem);
   const toggleWishlist = useWishlistStore((state) => state.toggleItem);
   const isInWishlist = useWishlistStore((state) => state.isInWishlist(product.id));
   const showToast = useToastStore((state) => state.showToast);
-  const router = useRouter();
 
   const inStock = product.stock > 0;
+
+  function requireLogin() {
+    router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`);
+  }
 
   function decreaseQty() {
     setQuantity((q) => Math.max(1, q - 1));
@@ -31,16 +39,28 @@ export function ProductInfo({ product }: { product: Product }) {
   }
 
   function handleAddToCart() {
+    if (!session?.user) {
+      requireLogin();
+      return;
+    }
     addItem(product, quantity, selectedColor, selectedSize);
     showToast(`${product.name} added to cart`);
   }
 
   function handleBuyNow() {
+    if (!session?.user) {
+      requireLogin();
+      return;
+    }
     addItem(product, quantity, selectedColor, selectedSize);
     router.push("/cart");
   }
 
   function handleToggleWishlist() {
+    if (!session?.user) {
+      requireLogin();
+      return;
+    }
     toggleWishlist(product);
     showToast(
       isInWishlist ? `${product.name} removed from wishlist` : `${product.name} added to wishlist`
@@ -61,10 +81,10 @@ export function ProductInfo({ product }: { product: Product }) {
       </div>
 
       <div className="mt-4 flex items-center gap-3">
-       <span className="text-3xl font-bold text-text">{formatPrice(product.price)}</span>
-      {product.originalPrice && (
-     <span className="text-lg text-muted line-through">{formatPrice(product.originalPrice)}</span>
-      )}
+        <span className="text-3xl font-bold text-text">{formatPrice(product.price)}</span>
+        {product.originalPrice && (
+          <span className="text-lg text-muted line-through">{formatPrice(product.originalPrice)}</span>
+        )}
         {product.discount && (
           <span className="rounded-full bg-accent px-2.5 py-1 text-xs font-semibold text-primary">
             -{product.discount}%
@@ -120,19 +140,11 @@ export function ProductInfo({ product }: { product: Product }) {
         <h3 className="text-sm font-semibold text-text">Quantity</h3>
         <div className="mt-2 flex items-center gap-3">
           <div className="flex items-center rounded-full border border-muted/20">
-            <button
-              onClick={decreaseQty}
-              aria-label="Decrease quantity"
-              className="p-2.5 text-text hover:text-secondary"
-            >
+            <button onClick={decreaseQty} aria-label="Decrease quantity" className="p-2.5 text-text hover:text-secondary">
               <Minus className="h-4 w-4" />
             </button>
             <span className="w-8 text-center text-sm font-semibold text-text">{quantity}</span>
-            <button
-              onClick={increaseQty}
-              aria-label="Increase quantity"
-              className="p-2.5 text-text hover:text-secondary"
-            >
+            <button onClick={increaseQty} aria-label="Increase quantity" className="p-2.5 text-text hover:text-secondary">
               <Plus className="h-4 w-4" />
             </button>
           </div>

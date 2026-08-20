@@ -1,15 +1,23 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { User, Package, Heart, LogOut } from "lucide-react";
-import { useOrderStore } from "@/stores/orderStore";
 import { useWishlistStore } from "@/stores/wishlistStore";
 
 export default function ProfilePage() {
   const { data: session, status } = useSession();
-  const orders = useOrderStore((state) => state.orders);
   const wishlistItems = useWishlistStore((state) => state.items);
+  const [orderCount, setOrderCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!session?.user) return;
+    fetch("/api/orders")
+      .then((res) => res.json())
+      .then((data) => setOrderCount(data.orders?.length ?? 0))
+      .catch(() => setOrderCount(0));
+  }, [session]);
 
   if (status === "loading") {
     return null;
@@ -58,7 +66,7 @@ export default function ProfilePage() {
                 <Package className="h-4 w-4 text-secondary" />
                 Order History
               </span>
-              <span className="text-xs text-muted">{orders.length}</span>
+              <span className="text-xs text-muted">{orderCount ?? "…"}</span>
             </Link>
             <Link
               href="/wishlist"

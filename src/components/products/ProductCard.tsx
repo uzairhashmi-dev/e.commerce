@@ -3,25 +3,42 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Heart, Star } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { usePathname, useRouter } from "next/navigation";
 import type { Product } from "@/types";
 import { useCartStore } from "@/stores/cartStore";
 import { useWishlistStore } from "@/stores/wishlistStore";
 import { useToastStore } from "@/stores/toastStore";
-import { formatPrice } from "@/utils/formatters";
-
+import { formatPrice } from  "@/utils/formatters";
 
 export function ProductCard({ product }: { product: Product }) {
+  const { data: session } = useSession();
+  const router = useRouter();
+  const pathname = usePathname();
+
   const addItem = useCartStore((state) => state.addItem);
   const toggleWishlist = useWishlistStore((state) => state.toggleItem);
   const isInWishlist = useWishlistStore((state) => state.isInWishlist(product.id));
   const showToast = useToastStore((state) => state.showToast);
 
+  function requireLogin() {
+    router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`);
+  }
+
   function handleAddToCart() {
+    if (!session?.user) {
+      requireLogin();
+      return;
+    }
     addItem(product, 1);
     showToast(`${product.name} added to cart`);
   }
 
   function handleToggleWishlist() {
+    if (!session?.user) {
+      requireLogin();
+      return;
+    }
     toggleWishlist(product);
     showToast(
       isInWishlist ? `${product.name} removed from wishlist` : `${product.name} added to wishlist`
@@ -72,14 +89,12 @@ export function ProductCard({ product }: { product: Product }) {
         </div>
 
         <div className="mt-1 flex items-center gap-2">
-          <span className="text-base font-bold text-text">
-  {formatPrice(product.price)}
-</span>
-{product.originalPrice && (
-  <span className="text-sm text-muted line-through">
-    {formatPrice(product.originalPrice)}
-  </span>
-)}
+          <span className="text-base font-bold text-text">{formatPrice(product.price)}</span>
+          {product.originalPrice && (
+            <span className="text-sm text-muted line-through">
+              {formatPrice(product.originalPrice)}
+            </span>
+          )}
         </div>
 
         <button
