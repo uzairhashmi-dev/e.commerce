@@ -93,8 +93,8 @@ export default function LoginPage() {
     }
 
     setLoading(false);
-    setSuccessMessage("Account created! Please log in.");
     switchMode("login");
+    setSuccessMessage("Account created! Please log in.");
   }
 
   async function handleGoogleSignIn() {

@@ -1,5 +1,7 @@
 import type { NextAuthConfig } from "next-auth";
 
+const PROTECTED_PATHS = ["/profile", "/orders"];
+
 export const authConfig = {
   pages: {
     signIn: "/login",
@@ -8,7 +10,8 @@ export const authConfig = {
   callbacks: {
     authorized({ auth, request }) {
       const isLoggedIn = !!auth?.user;
-      const isOnLogin = request.nextUrl.pathname === "/login";
+      const { pathname } = request.nextUrl;
+      const isOnLogin = pathname === "/login";
 
       if (isOnLogin) {
         if (isLoggedIn) {
@@ -17,7 +20,15 @@ export const authConfig = {
         return true;
       }
 
-      return isLoggedIn;
+      const isProtected = PROTECTED_PATHS.some(
+        (path) => pathname === path || pathname.startsWith(`${path}/`)
+      );
+
+      if (isProtected && !isLoggedIn) {
+        return false;
+      }
+
+      return true;
     },
   },
 } satisfies NextAuthConfig;
