@@ -7,6 +7,8 @@ import type { Product } from "@/types";
 import { useCartStore } from "@/stores/cartStore";
 import { useWishlistStore } from "@/stores/wishlistStore";
 import { useToastStore } from "@/stores/toastStore";
+import { formatPrice } from "@/utils/formatters";
+
 
 export function ProductCard({ product }: { product: Product }) {
   const addItem = useCartStore((state) => state.addItem);
@@ -70,12 +72,14 @@ export function ProductCard({ product }: { product: Product }) {
         </div>
 
         <div className="mt-1 flex items-center gap-2">
-          <span className="text-base font-bold text-text">${product.price.toFixed(2)}</span>
-          {product.originalPrice && (
-            <span className="text-sm text-muted line-through">
-              ${product.originalPrice.toFixed(2)}
-            </span>
-          )}
+          <span className="text-base font-bold text-text">
+  {formatPrice(product.price)}
+</span>
+{product.originalPrice && (
+  <span className="text-sm text-muted line-through">
+    {formatPrice(product.originalPrice)}
+  </span>
+)}
         </div>
 
         <button

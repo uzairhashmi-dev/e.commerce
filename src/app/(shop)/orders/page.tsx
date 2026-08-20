@@ -7,6 +7,7 @@ import { PackageOpen, ChevronRight } from "lucide-react";
 import { useOrderStore } from "@/stores/orderStore";
 import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { formatPrice } from "@/utils/formatters";
 
 export default function OrdersPage() {
   const [mounted, setMounted] = useState(false);
@@ -77,7 +78,7 @@ export default function OrdersPage() {
                 <p className="text-xs text-muted">
                   {order.items.reduce((sum, item) => sum + item.quantity, 0)} items
                 </p>
-                <p className="text-lg font-bold text-text">${order.total.toFixed(2)}</p>
+                <p className="text-lg font-bold text-text">{formatPrice(order.total)}</p>
               </div>
             </div>
           </Link>

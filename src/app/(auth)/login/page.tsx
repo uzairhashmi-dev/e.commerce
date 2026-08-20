@@ -282,13 +282,6 @@ export default function LoginPage() {
               </div>
             )}
 
-            {mode === "login" && (
-              <div className="flex items-center justify-end text-sm">
-                <button type="button" className="text-secondary hover:underline">
-                  Forgot password?
-                </button>
-              </div>
-            )}
 
             <button
               type="submit"

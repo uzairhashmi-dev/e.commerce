@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useCartStore } from "@/stores/cartStore";
 import { useOrderStore } from "@/stores/orderStore";
 import { validateCheckoutForm, type CheckoutFormData, type CheckoutErrors } from "@/lib/validation";
@@ -26,8 +27,8 @@ const initialFormData: CheckoutFormData = {
 };
 
 const SHIPPING_COST: Record<DeliveryMethod, number> = {
-  standard: 5.99,
-  express: 14.99,
+  standard: 200,
+  express: 500,
 };
 
 const TAX_RATE = 0.08;
@@ -46,6 +47,7 @@ export function CheckoutForm({
   onDeliveryChange: (method: DeliveryMethod) => void;
 }) {
   const router = useRouter();
+  const { data: session } = useSession();
   const items = useCartStore((state) => state.items);
   const subtotal = useCartStore((state) => state.subtotal());
   const clearCart = useCartStore((state) => state.clearCart);
@@ -54,6 +56,21 @@ export function CheckoutForm({
   const [formData, setFormData] = useState<CheckoutFormData>(initialFormData);
   const [errors, setErrors] = useState<CheckoutErrors>({});
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!session?.user) return;
+
+    const fullName = session.user.name ?? "";
+    const [first, ...rest] = fullName.split(" ");
+
+    setFormData((prev) => ({
+      ...prev,
+      firstName: prev.firstName || first || "",
+      lastName: prev.lastName || rest.join(" "),
+      email: prev.email || session.user?.email || "",
+    }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session]);
 
   function updateField(field: keyof CheckoutFormData, value: string) {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -213,7 +230,7 @@ export function CheckoutForm({
       </section>
 
       <section>
-        <h2 className="text-lg font-bold text-text">Delivery method</h2>
+        <h2 className="text-lg font-bold text-text">Delivery Method</h2>
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <button
             type="button"
@@ -226,7 +243,7 @@ export function CheckoutForm({
           >
             <Truck className="h-5 w-5 text-secondary" />
             <div>
-              <p className="text-sm font-semibold text-text">Standard — $5.99</p>
+              <p className="text-sm font-semibold text-text">Standard — Rs. 200</p>
               <p className="text-xs text-muted">5–7 business days</p>
             </div>
           </button>
@@ -241,25 +258,25 @@ export function CheckoutForm({
           >
             <Zap className="h-5 w-5 text-secondary" />
             <div>
-              <p className="text-sm font-semibold text-text">Express — $14.99</p>
-              <p className="text-xs text-muted">1–2 Business Days</p>
+              <p className="text-sm font-semibold text-text">Express — Rs. 500</p>
+              <p className="text-xs text-muted">1–2 business days</p>
             </div>
           </button>
         </div>
       </section>
 
       <section>
-        <h2 className="text-lg font-bold text-text">Payment method</h2>
+        <h2 className="text-lg font-bold text-text">Payment Method</h2>
         <p className="mt-1 text-xs text-muted">
-          Demo checkout only — no real payment will be Processed.
+          Demo checkout only — no real payment will be processed.
         </p>
 
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-          {[
-            { value: "card", label: "Credit / Debit Card", icon: CreditCard },
-            { value: "cod", label: "Cash on Delivery", icon: Banknote },
-            { value: "wallet", label: "Digital Wallet", icon: Wallet },
-          ].map(({ value, label, icon: Icon }) => (
+         {[
+        { value: "card", label: "Credit / Debit Card", icon: CreditCard },
+         { value: "cod", label: "Cash on Delivery", icon: Banknote },
+       { value: "wallet", label: "JazzCash / EasyPaisa", icon: Wallet },
+         ].map(({ value, label, icon: Icon }) => (
             <button
               key={value}
               type="button"

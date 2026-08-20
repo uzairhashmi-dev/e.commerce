@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { CheckCircle2, Package, Truck, Home } from "lucide-react";
 import { useOrderStore } from "@/stores/orderStore";
+import { formatPrice } from "@/utils/formatters";
 
 const statusSteps = ["Processing", "Shipped", "Delivered"] as const;
 
@@ -125,7 +126,7 @@ export default function OrderDetailsPage() {
                 </p>
               </div>
               <span className="text-sm font-semibold text-text">
-                ${(item.price * item.quantity).toFixed(2)}
+                {formatPrice(item.price * item.quantity)}
               </span>
             </div>
           ))}
@@ -134,19 +135,19 @@ export default function OrderDetailsPage() {
         <div className="mt-4 space-y-2 border-t border-muted/10 pt-4 text-sm">
           <div className="flex justify-between text-muted">
             <span>Subtotal</span>
-            <span className="text-text">${order.subtotal.toFixed(2)}</span>
+            <span className="text-text">{formatPrice(order.subtotal)}</span>
           </div>
           <div className="flex justify-between text-muted">
             <span>Shipping</span>
-            <span className="text-text">${order.shippingCost.toFixed(2)}</span>
+            <span className="text-text">{formatPrice(order.shippingCost)}</span>
           </div>
           <div className="flex justify-between text-muted">
             <span>Tax</span>
-            <span className="text-text">${order.tax.toFixed(2)}</span>
+            <span className="text-text">{formatPrice(order.tax)}</span>
           </div>
           <div className="flex justify-between border-t border-muted/10 pt-2 text-base font-bold text-text">
             <span>Total</span>
-            <span>${order.total.toFixed(2)}</span>
+            <span>{formatPrice(order.total)}</span>
           </div>
         </div>
       </div>

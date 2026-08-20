@@ -7,6 +7,7 @@ import { useCartStore } from "@/stores/cartStore";
 import { useWishlistStore } from "@/stores/wishlistStore";
 import { useToastStore } from "@/stores/toastStore";
 import { useRouter } from "next/navigation";
+import { formatPrice } from "@/utils/formatters";
 
 export function ProductInfo({ product }: { product: Product }) {
   const [selectedColor, setSelectedColor] = useState(product.colors?.[0] ?? undefined);
@@ -60,10 +61,10 @@ export function ProductInfo({ product }: { product: Product }) {
       </div>
 
       <div className="mt-4 flex items-center gap-3">
-        <span className="text-3xl font-bold text-text">${product.price.toFixed(2)}</span>
-        {product.originalPrice && (
-          <span className="text-lg text-muted line-through">${product.originalPrice.toFixed(2)}</span>
-        )}
+       <span className="text-3xl font-bold text-text">{formatPrice(product.price)}</span>
+      {product.originalPrice && (
+     <span className="text-lg text-muted line-through">{formatPrice(product.originalPrice)}</span>
+      )}
         {product.discount && (
           <span className="rounded-full bg-accent px-2.5 py-1 text-xs font-semibold text-primary">
             -{product.discount}%

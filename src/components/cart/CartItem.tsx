@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useCartStore, type CartItem as CartItemType } from "@/stores/cartStore";
+import { formatPrice } from "@/utils/formatters";
 
 export function CartItem({ item }: { item: CartItemType }) {
   const increaseQuantity = useCartStore((state) => state.increaseQuantity);
@@ -52,8 +53,8 @@ export function CartItem({ item }: { item: CartItemType }) {
 
           <div className="flex items-center gap-3">
             <span className="text-sm font-bold text-text">
-              ${(item.price * item.quantity).toFixed(2)}
-            </span>
+             {formatPrice(item.price * item.quantity)}
+                </span>
             <button
               onClick={() => removeItem(item.productId, item.color, item.size)}
               aria-label="Remove item"

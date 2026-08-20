@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useCartStore } from "@/stores/cartStore";
+import { formatPrice } from "@/utils/formatters";
 
-const SHIPPING_FLAT = 5.99;
+const SHIPPING_FLAT = 200;
 const TAX_RATE = 0.08;
 
 export function CartSummary() {
@@ -18,22 +19,22 @@ export function CartSummary() {
       <h2 className="text-lg font-bold text-text">Order Summary</h2>
       <div className="mt-4 space-y-2 text-sm">
         <div className="flex justify-between text-muted">
-          <span>Subtotal</span>
-          <span className="text-text">${subtotal.toFixed(2)}</span>
-        </div>
-        <div className="flex justify-between text-muted">
-          <span>Shipping</span>
-          <span className="text-text">${shipping.toFixed(2)}</span>
-        </div>
-        <div className="flex justify-between text-muted">
-          <span>Tax (8%)</span>
-          <span className="text-text">${tax.toFixed(2)}</span>
-        </div>
+  <span>Subtotal</span>
+  <span className="text-text">{formatPrice(subtotal)}</span>
+      </div>
+      <div className="flex justify-between text-muted">
+      <span>Shipping</span>
+       <span className="text-text">{formatPrice(shipping)}</span>
+      </div>
+      <div className="flex justify-between text-muted">
+      <span>Tax (8%)</span>
+      <span className="text-text">{formatPrice(tax)}</span>
+      </div>
       </div>
 
       <div className="mt-4 flex justify-between border-t border-muted/10 pt-4 text-base font-bold text-text">
         <span>Total</span>
-        <span>${total.toFixed(2)}</span>
+        <span>{formatPrice(total)}</span>
       </div>
 
       <Link

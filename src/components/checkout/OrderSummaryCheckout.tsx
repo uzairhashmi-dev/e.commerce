@@ -3,10 +3,11 @@
 import Image from "next/image";
 import { useCartStore } from "@/stores/cartStore";
 import type { DeliveryMethod } from "@/types";
+import { formatPrice } from "@/utils/formatters";
 
 const SHIPPING_COST: Record<DeliveryMethod, number> = {
-  standard: 5.99,
-  express: 14.99,
+  standard: 200,
+  express: 500,
 };
 
 const TAX_RATE = 0.08;
@@ -38,9 +39,9 @@ export function OrderSummaryCheckout({ deliveryMethod }: { deliveryMethod: Deliv
                 {item.color && item.color} {item.size && `· ${item.size}`}
               </p>
             </div>
-            <span className="text-xs font-semibold text-text">
-              ${(item.price * item.quantity).toFixed(2)}
-            </span>
+           <span className="text-xs font-semibold text-text">
+      {formatPrice(item.price * item.quantity)}
+          </span>
           </div>
         ))}
       </div>
