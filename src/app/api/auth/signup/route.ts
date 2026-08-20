@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import clientPromise from "@/lib/mongodb";

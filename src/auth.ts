@@ -4,8 +4,10 @@ import Credentials from "next-auth/providers/credentials";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import bcrypt from "bcryptjs";
 import clientPromise from "@/lib/mongodb";
+import { authConfig } from "@/auth.config";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  ...authConfig,
   adapter: MongoDBAdapter(clientPromise, { databaseName: "shopease" }),
   session: { strategy: "jwt" },
   providers: [
@@ -19,7 +21,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-            async authorize(credentials) {
+      async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
         const email = (credentials.email as string).toLowerCase().trim();
@@ -44,10 +46,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
-  pages: {
-    signIn: "/login",
-  },
   callbacks: {
+    ...authConfig.callbacks,
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;

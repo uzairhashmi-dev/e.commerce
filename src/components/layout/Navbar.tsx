@@ -1,9 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
-import { Menu, X, Search, Heart, ShoppingCart, User, Sun, Moon } from "lucide-react";
+import {
+  Menu,
+  X,
+  Search,
+  Heart,
+  ShoppingCart,
+  User,
+  Sun,
+  Moon,
+  LogOut,
+  Package,
+  ChevronDown,
+} from "lucide-react";
 import { Logo } from "./Logo";
 import { useTheme } from "@/hooks/useTheme";
 import { useCartStore } from "@/stores/cartStore";
@@ -17,9 +30,13 @@ const navLinks = [
 
 export function Navbar() {
   const router = useRouter();
+  const { data: session } = useSession();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const { theme, toggleTheme } = useTheme();
+
+  const profileMenuRef = useRef<HTMLDivElement>(null);
 
   const [mounted, setMounted] = useState(false);
   const totalItems = useCartStore((state) => state.totalItems());
@@ -29,11 +46,26 @@ export function Navbar() {
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+        setProfileMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   function handleSearchSubmit(e: React.FormEvent) {
     e.preventDefault();
     const query = searchValue.trim();
     router.push(query ? `/products?search=${encodeURIComponent(query)}` : "/products");
     setMobileOpen(false);
+  }
+
+  function handleLogout() {
+    setProfileMenuOpen(false);
+    signOut({ callbackUrl: "/login" });
   }
 
   return (
@@ -101,13 +133,63 @@ export function Navbar() {
             )}
           </Link>
 
-          <Link
-            href="/login"
-            aria-label="Profile"
-            className="hidden rounded-full p-2 text-text transition-colors hover:bg-background sm:block"
-          >
-            <User className="h-5 w-5" />
-          </Link>
+          {session ? (
+            <div className="relative hidden sm:block" ref={profileMenuRef}>
+              <button
+                onClick={() => setProfileMenuOpen((prev) => !prev)}
+                aria-label="Account menu"
+                className="flex items-center gap-1 rounded-full p-2 text-text transition-colors hover:bg-background"
+              >
+                <User className="h-5 w-5" />
+                <ChevronDown
+                  className={`h-3.5 w-3.5 transition-transform ${profileMenuOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+
+              {profileMenuOpen && (
+                <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl border border-muted/10 bg-card p-2 shadow-lg">
+                  <div className="border-b border-muted/10 px-3 py-2">
+                    <p className="line-clamp-1 text-sm font-semibold text-text">
+                      {session.user?.name}
+                    </p>
+                    <p className="line-clamp-1 text-xs text-muted">{session.user?.email}</p>
+                  </div>
+
+                  <Link
+                    href="/profile"
+                    onClick={() => setProfileMenuOpen(false)}
+                    className="mt-1 flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-text transition-colors hover:bg-background"
+                  >
+                    <User className="h-4 w-4 text-secondary" />
+                    My Profile
+                  </Link>
+                  <Link
+                    href="/orders"
+                    onClick={() => setProfileMenuOpen(false)}
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-text transition-colors hover:bg-background"
+                  >
+                    <Package className="h-4 w-4 text-secondary" />
+                    My Orders
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="mt-1 flex w-full items-center gap-2 rounded-lg border-t border-muted/10 px-3 py-2 pt-3 text-left text-sm text-error transition-colors hover:bg-error/10"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Log Out
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              aria-label="Login"
+              className="hidden rounded-full p-2 text-text transition-colors hover:bg-background sm:block"
+            >
+              <User className="h-5 w-5" />
+            </Link>
+          )}
 
           <button
             onClick={() => setMobileOpen((prev) => !prev)}
@@ -149,13 +231,42 @@ export function Navbar() {
             >
               Wishlist
             </Link>
-            <Link
-              href="/login"
-              onClick={() => setMobileOpen(false)}
-              className="rounded-lg px-3 py-2 text-sm font-medium text-text transition-colors hover:bg-background"
-            >
-              Login
-            </Link>
+            {session ? (
+              <>
+                <Link
+                  href="/profile"
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-lg px-3 py-2 text-sm font-medium text-text transition-colors hover:bg-background"
+                >
+                  Profile
+                </Link>
+                <Link
+                  href="/orders"
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-lg px-3 py-2 text-sm font-medium text-text transition-colors hover:bg-background"
+                >
+                  Orders
+                </Link>
+                <button
+                  onClick={() => {
+                    setMobileOpen(false);
+                    signOut({ callbackUrl: "/login" });
+                  }}
+                  className="flex items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-error transition-colors hover:bg-error/10"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Log Out
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setMobileOpen(false)}
+                className="rounded-lg px-3 py-2 text-sm font-medium text-text transition-colors hover:bg-background"
+              >
+                Login
+              </Link>
+            )}
           </nav>
         </div>
       )}

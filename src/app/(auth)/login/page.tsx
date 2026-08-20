@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Mail, Lock, Eye, EyeOff, User } from "lucide-react";
 import { validateEmail, validatePassword, validateSignupForm } from "@/lib/validation";
@@ -11,10 +11,14 @@ type Mode = "login" | "signup";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
+
   const [mode, setMode] = useState<Mode>("login");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formError, setFormError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -26,6 +30,7 @@ export default function LoginPage() {
   function resetErrors() {
     setFormError("");
     setFieldErrors({});
+    setSuccessMessage("");
   }
 
   function switchMode(next: Mode) {
@@ -59,7 +64,7 @@ export default function LoginPage() {
       return;
     }
 
-    router.push("/profile");
+    router.push(callbackUrl);
   }
 
   async function handleSignup(e: React.FormEvent) {
@@ -87,30 +92,20 @@ export default function LoginPage() {
       return;
     }
 
-    const result = await signIn("credentials", {
-      email: email.toLowerCase().trim(),
-      password,
-      redirect: false,
-    });
     setLoading(false);
-
-    if (result?.error) {
-      setFormError("Account created, but login failed. Please log in manually.");
-      switchMode("login");
-      return;
-    }
-
-    router.push("/profile");
+    setSuccessMessage("Account created! Please log in.");
+    switchMode("login");
   }
 
   async function handleGoogleSignIn() {
-    await signIn("google", { callbackUrl: "/profile" });
+    await signIn("google", { callbackUrl });
   }
 
   const passwordHint = mode === "signup" && password ? validatePassword(password) : null;
 
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
+      {/* Left — Branding */}
       <div className="relative hidden flex-col justify-between overflow-hidden bg-primary p-12 text-background lg:flex">
         <div className="absolute -inset-24 -z-10 rounded-full bg-accent/10 blur-3xl" />
 
@@ -120,7 +115,7 @@ export default function LoginPage() {
 
         <div>
           <p className="font-serif text-4xl italic leading-tight">
-            "Elegance, tailored for you."
+            &quot;Elegance, tailored for you.&quot;
           </p>
           <p className="mt-4 max-w-sm text-sm text-background/70">
             Join thousands of customers who trust ShopEase for shirts, ladies
@@ -133,6 +128,7 @@ export default function LoginPage() {
         </p>
       </div>
 
+      {/* Right — Form */}
       <div className="flex items-center justify-center bg-background px-4 py-12 sm:px-6">
         <div className="w-full max-w-sm">
           <Link href="/" className="mb-8 block text-xl font-bold text-primary lg:hidden">
@@ -168,9 +164,17 @@ export default function LoginPage() {
             <span className="h-px flex-1 bg-muted/15" />
           </div>
 
+          {/* Error Banner */}
           {formError && (
             <div className="mb-4 rounded-lg bg-error/10 px-3 py-2 text-sm text-error">
               {formError}
+            </div>
+          )}
+
+          {/* Success Banner */}
+          {successMessage && (
+            <div className="mb-4 rounded-lg bg-success/10 px-3 py-2 text-sm text-success">
+              {successMessage}
             </div>
           )}
 
@@ -214,10 +218,19 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value.toLowerCase())}
                   placeholder="you@example.com"
-                  className="w-full rounded-lg border border-muted/20 bg-card py-2.5 pl-9 pr-3 text-sm text-text outline-none focus:border-secondary"
+                  className="w-full rounded-lg border border-muted/20 bg-card py-2.5 pl-9 pr-9 text-sm text-text outline-none focus:border-secondary"
                 />
+                {email && !validateEmail(email) && (
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-success">
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </span>
+                )}
               </div>
-              {fieldErrors.email && <p className="mt-1 text-xs text-error">{fieldErrors.email}</p>}
+              {fieldErrors.email && (
+                <p className="mt-1 text-xs text-error">{fieldErrors.email}</p>
+              )}
             </div>
 
             <div>
