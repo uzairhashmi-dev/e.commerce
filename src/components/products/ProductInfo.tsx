@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Star, Heart, Minus, Plus } from "lucide-react";
 import type { Product } from "@/types";
 import { useCartStore } from "@/stores/cartStore";
@@ -15,20 +14,13 @@ export function ProductInfo({ product }: { product: Product }) {
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] ?? undefined);
   const [quantity, setQuantity] = useState(1);
 
-  const { data: session } = useSession();
   const router = useRouter();
-  const pathname = usePathname();
-
   const addItem = useCartStore((state) => state.addItem);
   const toggleWishlist = useWishlistStore((state) => state.toggleItem);
   const isInWishlist = useWishlistStore((state) => state.isInWishlist(product.id));
   const showToast = useToastStore((state) => state.showToast);
 
   const inStock = product.stock > 0;
-
-  function requireLogin() {
-    router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`);
-  }
 
   function decreaseQty() {
     setQuantity((q) => Math.max(1, q - 1));
@@ -39,28 +31,16 @@ export function ProductInfo({ product }: { product: Product }) {
   }
 
   function handleAddToCart() {
-    if (!session?.user) {
-      requireLogin();
-      return;
-    }
     addItem(product, quantity, selectedColor, selectedSize);
     showToast(`${product.name} added to cart`);
   }
 
   function handleBuyNow() {
-    if (!session?.user) {
-      requireLogin();
-      return;
-    }
     addItem(product, quantity, selectedColor, selectedSize);
     router.push("/cart");
   }
 
   function handleToggleWishlist() {
-    if (!session?.user) {
-      requireLogin();
-      return;
-    }
     toggleWishlist(product);
     showToast(
       isInWishlist ? `${product.name} removed from wishlist` : `${product.name} added to wishlist`

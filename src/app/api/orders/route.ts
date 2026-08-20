@@ -8,12 +8,6 @@ import type { Order } from "@/types";
 export async function POST(request: Request) {
   try {
     const session = await auth();
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: "You must be logged in to place an order" },
-        { status: 401 }
-      );
-    }
 
     const body = await request.json();
     const {
@@ -32,10 +26,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
     }
 
+    if (!customer?.email) {
+      return NextResponse.json({ error: "Email is required" }, { status: 400 });
+    }
+
     const order: Order = {
       id: `ORD-${Date.now().toString(36).toUpperCase()}`,
-      userId: session.user.id,
-      userEmail: session.user.email,
+      userId: session?.user?.id ?? null,
+      userEmail: session?.user?.email ?? customer.email,
       date: new Date().toISOString(),
       items,
       customer,

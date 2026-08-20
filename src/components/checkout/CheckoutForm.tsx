@@ -82,11 +82,6 @@ export function CheckoutForm({
     e.preventDefault();
     setSubmitError("");
 
-    if (!session?.user) {
-      router.push("/login?callbackUrl=/checkout");
-      return;
-    }
-
     const validationErrors = validateCheckoutForm(formData);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);

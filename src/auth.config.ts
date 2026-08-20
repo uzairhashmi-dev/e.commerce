@@ -1,7 +1,5 @@
 import type { NextAuthConfig } from "next-auth";
 
-const PROTECTED_PATHS = ["/profile", "/orders", "/cart", "/wishlist"];
-
 export const authConfig = {
   pages: {
     signIn: "/login",
@@ -20,11 +18,10 @@ export const authConfig = {
         return true;
       }
 
-      const isProtected = PROTECTED_PATHS.some(
-        (path) => pathname === path || pathname.startsWith(`${path}/`)
-      );
+      const isProfilePath = pathname === "/profile" || pathname.startsWith("/profile/");
+      const isOrdersListPath = pathname === "/orders";
 
-      if (isProtected && !isLoggedIn) {
+      if ((isProfilePath || isOrdersListPath) && !isLoggedIn) {
         return false;
       }
 

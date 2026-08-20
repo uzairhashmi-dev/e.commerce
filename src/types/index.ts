@@ -66,8 +66,8 @@ export interface ShippingAddress {
 
 export interface Order {
   id: string;
-  userId: string;      // ← NAYA
-  userEmail: string;   // ← NAYA
+  userId: string | null;   
+  userEmail: string;
   date: string;
   items: OrderItem[];
   customer: CustomerInfo;
