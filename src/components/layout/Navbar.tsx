@@ -16,6 +16,7 @@ import {
   LogOut,
   Package,
   ChevronDown,
+  Shield,
 } from "lucide-react";
 import { Logo } from "./Logo";
 import { useTheme } from "@/hooks/useTheme";
@@ -171,6 +172,16 @@ export function Navbar() {
                     <Package className="h-4 w-4 text-secondary" />
                     My Orders
                   </Link>
+                  {session.user?.role === "admin" && (
+                   <Link
+                       href="/admin"
+                        onClick={() => setProfileMenuOpen(false)}
+                         className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-text transition-colors hover:bg-background"
+                          >
+                         <Shield className="h-4 w-4 text-secondary" />
+                       Admin Panel
+                     </Link>
+                  )}
                   <button
                     onClick={handleLogout}
                     className="mt-1 flex w-full items-center gap-2 rounded-lg border-t border-muted/10 px-3 py-2 pt-3 text-left text-sm text-error transition-colors hover:bg-error/10"

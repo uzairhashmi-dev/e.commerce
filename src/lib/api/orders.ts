@@ -36,3 +36,9 @@ export async function getOrdersByUserEmail(email: string): Promise<Order[]> {
     .toArray();
     return orders as unknown as Order[];
   }
+export async function updateOrderStatus(id: string, status: string): Promise<boolean> {
+  const client = await clientPromise;
+  const db = client.db("shopease");
+  const result = await db.collection("orders").updateOne({ id }, { $set: { status } });
+  return result.modifiedCount > 0;
+}
