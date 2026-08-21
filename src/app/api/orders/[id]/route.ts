@@ -1,16 +1,16 @@
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { getAdminSession } from "@/lib/adminAuth";
 import { updateOrderStatus } from "@/lib/api/orders";
 
 const VALID_STATUSES = ["Processing", "Shipped", "Delivered", "Cancelled"];
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const session = await auth();
+    const admin = await getAdminSession();
 
-    if (!session?.user || session.user.role !== "admin") {
+    if (!admin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 

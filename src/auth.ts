@@ -49,12 +49,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     ...authConfig.callbacks,
     async jwt({ token, user }) {
-      if (user?.email) {
+      if (user?.id) {
         token.id = user.id;
-        const client = await clientPromise;
-        const db = client.db("shopease");
-        const dbUser = await db.collection("users").findOne({ email: user.email });
-        token.role = dbUser?.role ?? "customer";
       }
       return token;
     },
