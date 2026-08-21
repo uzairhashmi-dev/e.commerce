@@ -25,3 +25,14 @@ export async function getOrdersByUserEmail(email: string): Promise<Order[]> {
     .sort({ date: -1 })
     .toArray();
     return orders as unknown as Order[];}
+
+    export async function getAllOrders(): Promise<Order[]> {
+  const client = await clientPromise;
+  const db = client.db("shopease");
+  const orders = await db
+    .collection("orders")
+    .find({}, { projection: { _id: 0 } })
+    .sort({ date: -1 })
+    .toArray();
+    return orders as unknown as Order[];
+  }

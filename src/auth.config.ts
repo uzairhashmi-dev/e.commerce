@@ -18,6 +18,15 @@ export const authConfig = {
         return true;
       }
 
+      const isAdminPath = pathname === "/admin" || pathname.startsWith("/admin/");
+      if (isAdminPath) {
+        if (!isLoggedIn) return false;
+        if (auth?.user?.role !== "admin") {
+          return Response.redirect(new URL("/", request.nextUrl));
+        }
+        return true;
+      }
+
       const isProfilePath = pathname === "/profile" || pathname.startsWith("/profile/");
       const isOrdersListPath = pathname === "/orders";
 
