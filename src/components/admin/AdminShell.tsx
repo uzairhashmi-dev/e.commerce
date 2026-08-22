@@ -13,6 +13,8 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   ShieldCheck,
+  Menu,
+  X,
 } from "lucide-react";
 
 const navItems = [
@@ -31,8 +33,11 @@ export function AdminShell({
   children: React.ReactNode;
 }) {
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+
+  const showLabels = mobileOpen || !collapsed;
 
   async function handleLogout() {
     await fetch("/api/admin/logout", { method: "POST" });
@@ -40,39 +45,55 @@ export function AdminShell({
     router.refresh();
   }
 
+  function handleNavClick() {
+    setMobileOpen(false);
+  }
+
   return (
     <div className="flex min-h-screen bg-background">
+      {mobileOpen && (
+        <div
+          onClick={() => setMobileOpen(false)}
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+        />
+      )}
+
       <aside
-        className={`flex flex-col border-r border-muted/10 bg-primary text-background transition-all duration-200 ${
-          collapsed ? "w-20" : "w-64"
-        }`}
+        className={`fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-muted/10 bg-primary text-background transition-all duration-200 lg:static lg:translate-x-0 ${
+          collapsed ? "lg:w-20" : "lg:w-64"
+        } ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         <div
           className={`flex h-16 items-center border-b border-background/10 ${
-            collapsed ? "justify-center px-2" : "justify-between px-4"
+            showLabels ? "justify-between px-4" : "justify-center px-2"
           }`}
         >
-          {!collapsed && (
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="h-6 w-6 shrink-0 text-accent" />
-              <span className="font-bold">ShopEase Admin</span>
-            </div>
-          )}
-          {collapsed && <ShieldCheck className="h-6 w-6 shrink-0 text-accent" />}
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="h-6 w-6 shrink-0 text-accent" />
+            {showLabels && <span className="font-bold">ShopEase Admin</span>}
+          </div>
 
           <button
             onClick={() => setCollapsed((prev) => !prev)}
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            className={`rounded-lg p-1.5 text-background/70 hover:bg-background/10 hover:text-background ${
-              collapsed ? "hidden" : ""
+            className={`hidden rounded-lg p-1.5 text-background/70 hover:bg-background/10 hover:text-background lg:block ${
+              !showLabels ? "hidden" : ""
             }`}
           >
             <PanelLeftClose className="h-5 w-5" />
           </button>
+
+          <button
+            onClick={() => setMobileOpen(false)}
+            aria-label="Close menu"
+            className="rounded-lg p-1.5 text-background/70 hover:bg-background/10 hover:text-background lg:hidden"
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
 
-        {collapsed && (
-          <div className="flex justify-center border-b border-background/10 py-2">
+        {!showLabels && (
+          <div className="hidden justify-center border-b border-background/10 py-2 lg:flex">
             <button
               onClick={() => setCollapsed(false)}
               aria-label="Expand sidebar"
@@ -91,9 +112,10 @@ export function AdminShell({
               <Link
                 key={item.href}
                 href={item.href}
-                title={collapsed ? item.label : undefined}
+                onClick={handleNavClick}
+                title={!showLabels ? item.label : undefined}
                 className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-                  collapsed ? "justify-center" : ""
+                  !showLabels ? "justify-center" : ""
                 } ${
                   isActive
                     ? "bg-background/10 text-background"
@@ -101,29 +123,38 @@ export function AdminShell({
                 }`}
               >
                 <Icon className="h-4.5 w-4.5 shrink-0" />
-                {!collapsed && item.label}
+                {showLabels && item.label}
               </Link>
             );
           })}
         </nav>
       </aside>
 
-      <div className="flex flex-1 flex-col">
-        <header className="flex h-16 items-center justify-between border-b border-muted/10 bg-card px-6">
-          <div>
-            <p className="text-sm font-semibold text-text">{admin.name}</p>
-            <p className="text-xs text-muted">{admin.email}</p>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-muted/10 bg-card px-4 sm:px-6">
+          <div className="flex min-w-0 items-center gap-3">
+            <button
+              onClick={() => setMobileOpen(true)}
+              aria-label="Open menu"
+              className="rounded-lg p-2 text-text hover:bg-background lg:hidden"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-text">{admin.name}</p>
+              <p className="truncate text-xs text-muted">{admin.email}</p>
+            </div>
           </div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 rounded-full border border-muted/20 px-4 py-2 text-sm font-medium text-text transition-colors hover:bg-background"
+            className="flex shrink-0 items-center gap-2 rounded-full border border-muted/20 px-3 py-2 text-sm font-medium text-text transition-colors hover:bg-background sm:px-4"
           >
             <LogOut className="h-4 w-4" />
-            Log Out
+            <span className="hidden sm:inline">Log Out</span>
           </button>
         </header>
 
-        <main className="flex-1 p-6">{children}</main>
+        <main className="flex-1 overflow-x-hidden p-4 sm:p-6">{children}</main>
       </div>
     </div>
   );
