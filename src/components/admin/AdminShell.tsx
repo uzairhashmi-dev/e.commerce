@@ -10,8 +10,8 @@ import {
   Layers,
   Settings,
   LogOut,
-  ChevronsLeft,
-  ChevronsRight,
+  PanelLeftClose,
+  PanelLeftOpen,
   ShieldCheck,
 } from "lucide-react";
 
@@ -47,10 +47,41 @@ export function AdminShell({
           collapsed ? "w-20" : "w-64"
         }`}
       >
-        <div className="flex h-16 items-center gap-2 border-b border-background/10 px-4">
-          <ShieldCheck className="h-6 w-6 shrink-0 text-accent" />
-          {!collapsed && <span className="font-bold">ShopEase Admin</span>}
+        <div
+          className={`flex h-16 items-center border-b border-background/10 ${
+            collapsed ? "justify-center px-2" : "justify-between px-4"
+          }`}
+        >
+          {!collapsed && (
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="h-6 w-6 shrink-0 text-accent" />
+              <span className="font-bold">ShopEase Admin</span>
+            </div>
+          )}
+          {collapsed && <ShieldCheck className="h-6 w-6 shrink-0 text-accent" />}
+
+          <button
+            onClick={() => setCollapsed((prev) => !prev)}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className={`rounded-lg p-1.5 text-background/70 hover:bg-background/10 hover:text-background ${
+              collapsed ? "hidden" : ""
+            }`}
+          >
+            <PanelLeftClose className="h-5 w-5" />
+          </button>
         </div>
+
+        {collapsed && (
+          <div className="flex justify-center border-b border-background/10 py-2">
+            <button
+              onClick={() => setCollapsed(false)}
+              aria-label="Expand sidebar"
+              className="rounded-lg p-1.5 text-background/70 hover:bg-background/10 hover:text-background"
+            >
+              <PanelLeftOpen className="h-5 w-5" />
+            </button>
+          </div>
+        )}
 
         <nav className="flex-1 space-y-1 p-3">
           {navItems.map((item) => {
@@ -60,7 +91,10 @@ export function AdminShell({
               <Link
                 key={item.href}
                 href={item.href}
+                title={collapsed ? item.label : undefined}
                 className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                  collapsed ? "justify-center" : ""
+                } ${
                   isActive
                     ? "bg-background/10 text-background"
                     : "text-background/70 hover:bg-background/5 hover:text-background"
@@ -72,22 +106,6 @@ export function AdminShell({
             );
           })}
         </nav>
-
-        <div className="border-t border-background/10 p-3">
-          <button
-            onClick={() => setCollapsed((prev) => !prev)}
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-background/70 hover:bg-background/5 hover:text-background"
-          >
-            {collapsed ? (
-              <ChevronsRight className="h-4.5 w-4.5" />
-            ) : (
-              <>
-                <ChevronsLeft className="h-4.5 w-4.5" />
-                Collapse
-              </>
-            )}
-          </button>
-        </div>
       </aside>
 
       <div className="flex flex-1 flex-col">
